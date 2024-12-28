@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Posts on Sameer&#39;s Blog</title>
+    <link>https://sameerahman24.github.io/posts/</link>
+    <description>Recent content in Posts on Sameer&#39;s Blog</description>
+    <generator>Hugo -- 0.140.1</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 28 Dec 2024 20:07:49 +0600</lastBuildDate>
+    <atom:link href="https://sameerahman24.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>About me</title>
+      <link>https://sameerahman24.github.io/posts/aboutme/</link>
+      <pubDate>Sat, 28 Dec 2024 20:07:49 +0600</pubDate>
+      <guid>https://sameerahman24.github.io/posts/aboutme/</guid>
+      <description>&lt;h2 id=&#34;the-start&#34;&gt;The Start&lt;/h2&gt;
+&lt;p&gt;Hello my name is &lt;strong&gt;Sameer&lt;/strong&gt; and this is the start of my new blog. This is where I will be posting occasionally what projects I am currently doing and what new skills I learned. You can follow along with me as well and if you have any questions feel free to contact me throught my email.&lt;/p&gt;
+&lt;p&gt;These are my socials:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;[LinkedIn] (&lt;a href=&#34;https://www.linkedin.com/in/sameerahman-&#34;&gt;www.linkedin.com/in/sameerahman-&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;[Youtube] (&lt;a href=&#34;https://www.youtube.com/@sameerahman24&#34;&gt;https://www.youtube.com/@sameerahman24&lt;/a&gt;)&lt;/li&gt;
+&lt;/ol&gt;</description>
+    </item>
+  </channel>
+</rss>
