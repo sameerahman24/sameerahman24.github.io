@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Using ESP32 camera module to take pictures  | Sameer&#39;s Blog</title>
+<meta name="keywords" content="Projects">
+<meta name="description" content="Introduction
+I recently got an internship where I was tasked to program a microcontroller, specifically ESP32-based M5TimerCamera. The camera is connected to an external lens and is used as a microscope to display the images taken onto a smartphone device. By joining the WiFi access point of the M5Camera and going to the IP address from the browser, images can be captured by clicking a button. Furthermore, specific settings like exposure and gain values can be changed from the web browser as well.">
+<meta name="author" content="">
+<link rel="canonical" href="https://sameerahman.com/posts/m5microscope/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.d6fcd20a4fb86efa4dfac8ec95da60244cc8871042183da1ef28e3a762ad79c8.css" integrity="sha256-1vzSCk&#43;4bvpN&#43;sjsldpgJEzIhxBCGD2h7yjjp2Ktecg=" rel="preload stylesheet" as="style">
+<link rel="icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://sameerahman.com/posts/m5microscope/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:url" content="https://sameerahman.com/posts/m5microscope/">
+  <meta property="og:site_name" content="Sameer&#39;s Blog">
+  <meta property="og:title" content="Using ESP32 camera module to take pictures ">
+  <meta property="og:description" content="Introduction I recently got an internship where I was tasked to program a microcontroller, specifically ESP32-based M5TimerCamera. The camera is connected to an external lens and is used as a microscope to display the images taken onto a smartphone device. By joining the WiFi access point of the M5Camera and going to the IP address from the browser, images can be captured by clicking a button. Furthermore, specific settings like exposure and gain values can be changed from the web browser as well.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-03-13T00:00:00+00:00">
+    <meta property="article:modified_time" content="2025-03-13T00:00:00+00:00">
+    <meta property="article:tag" content="Projects">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Using ESP32 camera module to take pictures ">
+<meta name="twitter:description" content="Introduction
+I recently got an internship where I was tasked to program a microcontroller, specifically ESP32-based M5TimerCamera. The camera is connected to an external lens and is used as a microscope to display the images taken onto a smartphone device. By joining the WiFi access point of the M5Camera and going to the IP address from the browser, images can be captured by clicking a button. Furthermore, specific settings like exposure and gain values can be changed from the web browser as well.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://sameerahman.com/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Using ESP32 camera module to take pictures ",
+      "item": "https://sameerahman.com/posts/m5microscope/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Using ESP32 camera module to take pictures ",
+  "name": "Using ESP32 camera module to take pictures ",
+  "description": "Introduction I recently got an internship where I was tasked to program a microcontroller, specifically ESP32-based M5TimerCamera. The camera is connected to an external lens and is used as a microscope to display the images taken onto a smartphone device. By joining the WiFi access point of the M5Camera and going to the IP address from the browser, images can be captured by clicking a button. Furthermore, specific settings like exposure and gain values can be changed from the web browser as well.\n",
+  "keywords": [
+    "Projects"
+  ],
+  "articleBody": "Introduction I recently got an internship where I was tasked to program a microcontroller, specifically ESP32-based M5TimerCamera. The camera is connected to an external lens and is used as a microscope to display the images taken onto a smartphone device. By joining the WiFi access point of the M5Camera and going to the IP address from the browser, images can be captured by clicking a button. Furthermore, specific settings like exposure and gain values can be changed from the web browser as well.\nIn this blog post, I’ll walk you through my custom ESP32 camera system, which allows remote image capture, LED indication, power management, and a simple web server interface. The system is built using an ESP32-based M5Stack TimerCAM module and leverages FreeRTOS tasks for efficient operation.\nFeatures Task-Based Image Capture: Runs a separate task for handling camera captures without blocking the main loop. Web Server: Allows users to capture images remotely and adjust camera settings. Power Management: Puts the ESP32 into deep sleep after inactivity to conserve power. Adjustable Camera Settings: Users can modify exposure and gain dynamically via web requests. Parallel Processing: Camera operations run on Core 0 while the main application logic (web server, WiFi, UI) runs on Core 1, enabling true parallelism. Non-blocking Operation: Ensures that the main application remains responsive during image capturing. Hardware Requirements M5Stack TimerCAM (or similar ESP32 camera module) Power source (Battery or USB) LED for capture indication (optional) Code Breakdown 1. Camera Configuration Firstly, I needed to configure the pins correctly using the information available in the internet. I had to tinker a bit with settings like .jpeg_quality, .frame_size and .xclk_freq_hz to find the optimal settings for the camera to function with no bugs. This is because, when using a higher resolution with minimal compression (for example .jpeg_quality = 1) the images tend to have artifacts as there were both processing and memory challenges that the device could not keep up.\n#include #include \"camera.h\" #include camera_config_t config = { .pin_pwdn = -1, // Not used on M5Stack Timer CAM .pin_reset = 15, // RESET pin .pin_xclk = 27, // XCLK pin .pin_sccb_sda = 25, // SDA pin .pin_sccb_scl = 23, // SCL pin .pin_d7 = 19, // Y9 pin .pin_d6 = 36, // Y8 pin .pin_d5 = 18, // Y7 pin .pin_d4 = 39, // Y6 pin .pin_d3 = 5, // Y5 pin .pin_d2 = 34, // Y4 pin .pin_d1 = 35, // Y3 pin .pin_d0 = 32, // Y2 pin .pin_vsync = 22, // VSYNC pin .pin_href = 26, // HREF pin .pin_pclk = 21, // PCLK pin .xclk_freq_hz = 20000000, // Frequency .ledc_timer = LEDC_TIMER_0, .ledc_channel = LEDC_CHANNEL_0, .pixel_format = PIXFORMAT_JPEG, .frame_size = FRAMESIZE_UXGA, // Resolution of image .jpeg_quality = 3, // Compression level (higher = more compression) .fb_count = 1, // Number of frame buffers in memory .grab_mode = CAMERA_GRAB_LATEST }; The problem was even more evident before I implemented multi-threading. I had to use lower camera settings to take pictures.\nThat is why I implemented it to make the camera task run separately on Core 0, handling image capture requests asynchronously. This ensures that everything else can run smoothly on Core 1. This fixed issues like sudden connection losses and crashed.\nvoid cameraTask(void *parameter) { while (true) { if (captureRequested \u0026\u0026 !captureInProgress) { captureInProgress = true; capturedFrame = esp_camera_fb_get(); captureRequested = false; captureInProgress = false; if (capturedFrame) { xSemaphoreGive(frameReadySemaphore); } } vTaskDelay(5 / portTICK_PERIOD_MS); } } 2. Web Server for Remote Access In this section, the ESP32 sets up a web server that listens on port 80, allowing remote devices to send HTTP requests to control the camera. The core function, handleCapture(), is responsible for initiating an image capture when a client accesses the /capture endpoint. Once the image is captured using our task-based method, it sends the JPEG image data as an HTTP response.\n#include #include #include \"camera.h\" AsyncWebServer server(80); void handleCapture(AsyncWebServerRequest *request) { camera_fb_t *fb = captureImage(); if (!fb) { request-\u003esend(500, \"text/plain\", \"Camera capture failed\"); return; } request-\u003esend(200, \"image/jpeg\", fb-\u003ebuf, fb-\u003elen); } The image can then be viewed and saved into the device from the web browser.\n3. Power Management Another problem I was facing was battery life. At most the device lasted for around 20 minutes. To extend battery life, the system monitors activity by seeing when was the last time /capture endpoint was accessed and enters deep sleep if it hasn’t been accessed in more than 3 minutes.\n#include \"power.h\" #include unsigned long lastCaptureTime = 0; const unsigned long inactivityTimeout = 180000; void checkInactivity() { if (millis() - lastCaptureTime \u003e= inactivityTimeout) { Serial.println(\"Entering deep sleep...\"); esp_deep_sleep_start(); } } 4. Setting Up the Web Interface The ESP32 also serves a user-friendly HTML page stored in SPIFFS, which acts as the control panel for the camera. When a client navigates to the root URL (/), the server checks for the existence of an index.html file. If found, it sends the HTML content to the client; otherwise, it returns a 404 error. This HTML interface includes various elements such as a status panel, image display, and controls (buttons and sliders) to capture images, update camera settings, and even trigger deep sleep.\nserver.on(\"/\", HTTP_GET, [](AsyncWebServerRequest *request){ if (SPIFFS.exists(\"/index.html\")) { request-\u003esend(SPIFFS, \"/index.html\", \"text/html\"); } else { request-\u003esend(404, \"text/plain\", \"File not found\"); } }); 5. Web Interface Design and Functionality The web interface is designed to provide a user-friendly experience for capturing images and adjusting camera settings. It consists of:\nA status panel displaying IP address, battery level, and countdown timer before shutdown. An image container that shows the captured image. A control panel with sliders for exposure and gain adjustment. A capture button to trigger image capture remotely. A sleep button to put the device into deep sleep manually. The interface dynamically updates battery level and countdown timer using JavaScript, making periodic requests to the ESP32 server. Users can modify exposure and gain using sliders, and the settings are applied instantly upon clicking the update button.\nConclusion While working on this I have learned a lot. From C++ to multithreading, this project has been quite rewarding. This project has helped me develop skills like problem solving and communication skills that I developed working with my supervisor in the lab.\n",
+  "wordCount" : "1037",
+  "inLanguage": "en",
+  "datePublished": "2025-03-13T00:00:00Z",
+  "dateModified": "2025-03-13T00:00:00Z",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://sameerahman.com/posts/m5microscope/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Sameer's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://sameerahman.com/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://sameerahman.com/" accesskey="h" title="Sameer&#39;s Blog (Alt + H)">Sameer&#39;s Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+
+            
+            
+            <li><a href="/archives/" title="Archives">Archives</a></li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      Using ESP32 camera module to take pictures 
+    </h1>
+    <div class="post-meta"><span title='2025-03-13 00:00:00 +0000 UTC'>March 13, 2025</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h2 id="introduction">Introduction<a hidden class="anchor" aria-hidden="true" href="#introduction">#</a></h2>
+<p>I recently got an internship where I was tasked to program a microcontroller, specifically ESP32-based M5TimerCamera. The camera is connected to an external lens and is used as a microscope to display the images taken onto a smartphone device. By joining the WiFi access point of the M5Camera and going to the IP address from the browser, images can be captured by clicking a button. Furthermore, specific settings like exposure and gain values can be changed from the web browser as well.</p>
+<p>In this blog post, I’ll walk you through my custom ESP32 camera system, which allows remote image capture, LED indication, power management, and a simple web server interface. The system is built using an ESP32-based M5Stack TimerCAM module and leverages FreeRTOS tasks for efficient operation.</p>
+<h2 id="features">Features<a hidden class="anchor" aria-hidden="true" href="#features">#</a></h2>
+<ul>
+<li><strong>Task-Based Image Capture</strong>: Runs a separate task for handling camera captures without blocking the main loop.</li>
+<li><strong>Web Server</strong>: Allows users to capture images remotely and adjust camera settings.</li>
+<li><strong>Power Management</strong>: Puts the ESP32 into deep sleep after inactivity to conserve power.</li>
+<li><strong>Adjustable Camera Settings</strong>: Users can modify exposure and gain dynamically via web requests.</li>
+<li><strong>Parallel Processing</strong>: Camera operations run on Core 0 while the main application logic (web server, WiFi, UI) runs on Core 1, enabling true parallelism.</li>
+<li><strong>Non-blocking Operation</strong>: Ensures that the main application remains responsive during image capturing.</li>
+</ul>
+<h2 id="hardware-requirements">Hardware Requirements<a hidden class="anchor" aria-hidden="true" href="#hardware-requirements">#</a></h2>
+<ul>
+<li>M5Stack TimerCAM (or similar ESP32 camera module)</li>
+<li>Power source (Battery or USB)</li>
+<li>LED for capture indication (optional)</li>
+</ul>
+<h2 id="code-breakdown">Code Breakdown<a hidden class="anchor" aria-hidden="true" href="#code-breakdown">#</a></h2>
+<h3 id="1-camera-configuration">1. Camera Configuration<a hidden class="anchor" aria-hidden="true" href="#1-camera-configuration">#</a></h3>
+<p>Firstly, I needed to configure the pins correctly using the information available in the internet. I had to tinker a bit with settings like <code>.jpeg_quality</code>, <code>.frame_size</code> and <code>.xclk_freq_hz</code> to find the optimal settings for the camera to function with no bugs. This is because, when using a higher resolution with minimal compression (for example <code>.jpeg_quality = 1</code>) the images tend to have artifacts as there were both processing and memory challenges that the device could not keep up.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;Arduino.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;camera.h&#34;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;esp_camera.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>camera_config_t config <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    .pin_pwdn <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>,        <span style="color:#75715e">// Not used on M5Stack Timer CAM
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    .pin_reset <span style="color:#f92672">=</span> <span style="color:#ae81ff">15</span>,       <span style="color:#75715e">// RESET pin
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    .pin_xclk <span style="color:#f92672">=</span> <span style="color:#ae81ff">27</span>,        <span style="color:#75715e">// XCLK pin
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    .pin_sccb_sda <span style="color:#f92672">=</span> <span style="color:#ae81ff">25</span>,    <span style="color:#75715e">// SDA pin
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    .pin_sccb_scl <span style="color:#f92672">=</span> <span style="color:#ae81ff">23</span>,    <span style="color:#75715e">// SCL pin
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    .pin_d7 <span style="color:#f92672">=</span> <span style="color:#ae81ff">19</span>,          <span style="color:#75715e">// Y9 pin
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    .pin_d6 <span style="color:#f92672">=</span> <span style="color:#ae81ff">36</span>,          <span style="color:#75715e">// Y8 pin
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    .pin_d5 <span style="color:#f92672">=</span> <span style="color:#ae81ff">18</span>,          <span style="color:#75715e">// Y7 pin
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    .pin_d4 <span style="color:#f92672">=</span> <span style="color:#ae81ff">39</span>,          <span style="color:#75715e">// Y6 pin
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    .pin_d3 <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>,           <span style="color:#75715e">// Y5 pin
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    .pin_d2 <span style="color:#f92672">=</span> <span style="color:#ae81ff">34</span>,          <span style="color:#75715e">// Y4 pin
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    .pin_d1 <span style="color:#f92672">=</span> <span style="color:#ae81ff">35</span>,          <span style="color:#75715e">// Y3 pin
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    .pin_d0 <span style="color:#f92672">=</span> <span style="color:#ae81ff">32</span>,          <span style="color:#75715e">// Y2 pin
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    .pin_vsync <span style="color:#f92672">=</span> <span style="color:#ae81ff">22</span>,       <span style="color:#75715e">// VSYNC pin
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    .pin_href <span style="color:#f92672">=</span> <span style="color:#ae81ff">26</span>,        <span style="color:#75715e">// HREF pin
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    .pin_pclk <span style="color:#f92672">=</span> <span style="color:#ae81ff">21</span>,        <span style="color:#75715e">// PCLK pin
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    .xclk_freq_hz <span style="color:#f92672">=</span> <span style="color:#ae81ff">20000000</span>, <span style="color:#75715e">// Frequency 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    .ledc_timer <span style="color:#f92672">=</span> LEDC_TIMER_0,
+</span></span><span style="display:flex;"><span>    .ledc_channel <span style="color:#f92672">=</span> LEDC_CHANNEL_0,
+</span></span><span style="display:flex;"><span>    .pixel_format <span style="color:#f92672">=</span> PIXFORMAT_JPEG, 
+</span></span><span style="display:flex;"><span>    .frame_size <span style="color:#f92672">=</span> FRAMESIZE_UXGA, <span style="color:#75715e">// Resolution of image
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    .jpeg_quality <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>,  <span style="color:#75715e">// Compression level (higher = more compression)         
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    .fb_count <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>,      <span style="color:#75715e">// Number of frame buffers in memory        
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    .grab_mode <span style="color:#f92672">=</span> CAMERA_GRAB_LATEST               
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><p>The problem was even more evident before I implemented multi-threading. I had to use lower camera settings to take pictures.</p>
+<p>That is why I implemented it to make the camera task run separately on Core 0, handling image capture requests asynchronously. This ensures that everything else can run smoothly on Core 1. This fixed issues like sudden connection losses and crashed.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">cameraTask</span>(<span style="color:#66d9ef">void</span> <span style="color:#f92672">*</span>parameter) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> (true) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (captureRequested <span style="color:#f92672">&amp;&amp;</span> <span style="color:#f92672">!</span>captureInProgress) {
+</span></span><span style="display:flex;"><span>            captureInProgress <span style="color:#f92672">=</span> true;
+</span></span><span style="display:flex;"><span>            capturedFrame <span style="color:#f92672">=</span> esp_camera_fb_get();
+</span></span><span style="display:flex;"><span>            captureRequested <span style="color:#f92672">=</span> false;
+</span></span><span style="display:flex;"><span>            captureInProgress <span style="color:#f92672">=</span> false;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (capturedFrame) {
+</span></span><span style="display:flex;"><span>                xSemaphoreGive(frameReadySemaphore);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        vTaskDelay(<span style="color:#ae81ff">5</span> <span style="color:#f92672">/</span> portTICK_PERIOD_MS);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="2-web-server-for-remote-access">2. Web Server for Remote Access<a hidden class="anchor" aria-hidden="true" href="#2-web-server-for-remote-access">#</a></h3>
+<p>In this section, the ESP32 sets up a web server that listens on port 80, allowing remote devices to send HTTP requests to control the camera. The core function, <code>handleCapture()</code>, is responsible for initiating an image capture when a client accesses the <code>/capture</code> endpoint. Once the image is captured using our task-based method, it sends the JPEG image data as an HTTP response.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;WiFi.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;ESPAsyncWebServer.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;camera.h&#34;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>AsyncWebServer <span style="color:#a6e22e">server</span>(<span style="color:#ae81ff">80</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">handleCapture</span>(AsyncWebServerRequest <span style="color:#f92672">*</span>request) {
+</span></span><span style="display:flex;"><span>    camera_fb_t <span style="color:#f92672">*</span>fb <span style="color:#f92672">=</span> captureImage();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>fb) {
+</span></span><span style="display:flex;"><span>        request<span style="color:#f92672">-&gt;</span>send(<span style="color:#ae81ff">500</span>, <span style="color:#e6db74">&#34;text/plain&#34;</span>, <span style="color:#e6db74">&#34;Camera capture failed&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    request<span style="color:#f92672">-&gt;</span>send(<span style="color:#ae81ff">200</span>, <span style="color:#e6db74">&#34;image/jpeg&#34;</span>, fb<span style="color:#f92672">-&gt;</span>buf, fb<span style="color:#f92672">-&gt;</span>len);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The image can then be viewed and saved into the device from the web browser.</p>
+<h3 id="3-power-management">3. Power Management<a hidden class="anchor" aria-hidden="true" href="#3-power-management">#</a></h3>
+<p>Another problem I was facing was battery life. At most the device lasted for around 20 minutes. To extend battery life, the system monitors activity by seeing when was the last time /capture endpoint was accessed and enters deep sleep if it hasn&rsquo;t been accessed in more than 3 minutes.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;power.h&#34;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;esp_sleep.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span> lastCaptureTime <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span> inactivityTimeout <span style="color:#f92672">=</span> <span style="color:#ae81ff">180000</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">checkInactivity</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (millis() <span style="color:#f92672">-</span> lastCaptureTime <span style="color:#f92672">&gt;=</span> inactivityTimeout) {
+</span></span><span style="display:flex;"><span>        Serial.println(<span style="color:#e6db74">&#34;Entering deep sleep...&#34;</span>);
+</span></span><span style="display:flex;"><span>        esp_deep_sleep_start();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="4-setting-up-the-web-interface">4. Setting Up the Web Interface<a hidden class="anchor" aria-hidden="true" href="#4-setting-up-the-web-interface">#</a></h3>
+<p>The ESP32 also serves a user-friendly HTML page stored in SPIFFS, which acts as the control panel for the camera. When a client navigates to the root URL (<code>/</code>), the server checks for the existence of an <code>index.html</code> file. If found, it sends the HTML content to the client; otherwise, it returns a 404 error. This HTML interface includes various elements such as a status panel, image display, and controls (buttons and sliders) to capture images, update camera settings, and even trigger deep sleep.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>server.on(<span style="color:#e6db74">&#34;/&#34;</span>, HTTP_GET, [](AsyncWebServerRequest <span style="color:#f92672">*</span>request){
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (SPIFFS.exists(<span style="color:#e6db74">&#34;/index.html&#34;</span>)) {
+</span></span><span style="display:flex;"><span>        request<span style="color:#f92672">-&gt;</span>send(SPIFFS, <span style="color:#e6db74">&#34;/index.html&#34;</span>, <span style="color:#e6db74">&#34;text/html&#34;</span>);
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        request<span style="color:#f92672">-&gt;</span>send(<span style="color:#ae81ff">404</span>, <span style="color:#e6db74">&#34;text/plain&#34;</span>, <span style="color:#e6db74">&#34;File not found&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><h3 id="5-web-interface-design-and-functionality">5. Web Interface Design and Functionality<a hidden class="anchor" aria-hidden="true" href="#5-web-interface-design-and-functionality">#</a></h3>
+<p>The web interface is designed to provide a user-friendly experience for capturing images and adjusting camera settings. It consists of:</p>
+<ul>
+<li>A <strong>status panel</strong> displaying IP address, battery level, and countdown timer before shutdown.</li>
+<li>An <strong>image container</strong> that shows the captured image.</li>
+<li>A <strong>control panel</strong> with sliders for exposure and gain adjustment.</li>
+<li>A <strong>capture button</strong> to trigger image capture remotely.</li>
+<li>A <strong>sleep button</strong> to put the device into deep sleep manually.</li>
+</ul>
+<p>The interface dynamically updates battery level and countdown timer using JavaScript, making periodic requests to the ESP32 server. Users can modify exposure and gain using sliders, and the settings are applied instantly upon clicking the update button.</p>
+<h2 id="conclusion">Conclusion<a hidden class="anchor" aria-hidden="true" href="#conclusion">#</a></h2>
+<p>While working on this I have learned a lot. From C++ to multithreading, this project has been quite rewarding. This project has helped me develop skills like problem solving and communication skills that I developed working with my supervisor in the lab.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://sameerahman.com/tags/projects/">Projects</a></li>
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="https://sameerahman.com/">Sameer&#39;s Blog</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

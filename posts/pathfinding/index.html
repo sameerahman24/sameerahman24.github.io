@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Developing a Path Finding Algorithm for my game | Sameer&#39;s Blog</title>
+<meta name="keywords" content="Projects">
+<meta name="description" content="Introduction
+I was creating a game inspired from Pacman to brush up my coding skills that I learnt on the first semester of college only to come across a road block. How will the ghosts track the player and move towards you? The solution I used is the Greedy Best-First Search. Now before we dive into it we must first familiarize ourselves with how the ghosts move in the game itself.">
+<meta name="author" content="">
+<link rel="canonical" href="https://sameerahman.com/posts/pathfinding/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.d6fcd20a4fb86efa4dfac8ec95da60244cc8871042183da1ef28e3a762ad79c8.css" integrity="sha256-1vzSCk&#43;4bvpN&#43;sjsldpgJEzIhxBCGD2h7yjjp2Ktecg=" rel="preload stylesheet" as="style">
+<link rel="icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://sameerahman.com/posts/pathfinding/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:url" content="https://sameerahman.com/posts/pathfinding/">
+  <meta property="og:site_name" content="Sameer&#39;s Blog">
+  <meta property="og:title" content="Developing a Path Finding Algorithm for my game">
+  <meta property="og:description" content="Introduction I was creating a game inspired from Pacman to brush up my coding skills that I learnt on the first semester of college only to come across a road block. How will the ghosts track the player and move towards you? The solution I used is the Greedy Best-First Search. Now before we dive into it we must first familiarize ourselves with how the ghosts move in the game itself.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-01-21T00:00:00+00:00">
+    <meta property="article:modified_time" content="2025-01-21T00:00:00+00:00">
+    <meta property="article:tag" content="Projects">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Developing a Path Finding Algorithm for my game">
+<meta name="twitter:description" content="Introduction
+I was creating a game inspired from Pacman to brush up my coding skills that I learnt on the first semester of college only to come across a road block. How will the ghosts track the player and move towards you? The solution I used is the Greedy Best-First Search. Now before we dive into it we must first familiarize ourselves with how the ghosts move in the game itself.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://sameerahman.com/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Developing a Path Finding Algorithm for my game",
+      "item": "https://sameerahman.com/posts/pathfinding/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Developing a Path Finding Algorithm for my game",
+  "name": "Developing a Path Finding Algorithm for my game",
+  "description": "Introduction I was creating a game inspired from Pacman to brush up my coding skills that I learnt on the first semester of college only to come across a road block. How will the ghosts track the player and move towards you? The solution I used is the Greedy Best-First Search. Now before we dive into it we must first familiarize ourselves with how the ghosts move in the game itself.\n",
+  "keywords": [
+    "Projects"
+  ],
+  "articleBody": "Introduction I was creating a game inspired from Pacman to brush up my coding skills that I learnt on the first semester of college only to come across a road block. How will the ghosts track the player and move towards you? The solution I used is the Greedy Best-First Search. Now before we dive into it we must first familiarize ourselves with how the ghosts move in the game itself.\nUnderstanding the Ghost’s Movement The ghost moves on a grid, where its primary goal is to either chase Pac-Man or, when scared, run away from him. To decide where to move next, the ghost needs to evaluate all possible directions and choose the best one. This is where pathfinding comes in. Specifically, the ghost evaluates its potential moves using a heuristic called the Manhattan Distance.\nThe Concept of Manhattan Distance Manhattan Distance is a simple but effective way to measure the distance between two points on a grid. The term comes from the layout of streets in the Manhattan borough of New York, where streets are aligned in a grid pattern. In this system, the distance between two points is calculated by summing the absolute differences of their respective x and y coordinates.\nFor example, if the ghost is at position (2, 3) and Pac-Man is at (5, 5), the Manhattan Distance would be:\nHorizontal distance = |5 - 2| = 3 Vertical distance = |5 - 3| = 2 Total Manhattan Distance = 3 + 2 = 5\nDirections Array The ghost can move up, down, left, or right and these options are represented as:\nprivate static final int[][] DIRECTIONS = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}}; {-1, 0}: Move up {1, 0}: Move down {0, -1}: Move left {0, 1}: Move right The Pathfinding Method The main method that determines the ghost’s movement is:\nprivate int[] findBestPath(char[][] grid, int targetRow, int targetCol, boolean away) Parameters: grid: The game grid, which includes walls (‘W’), (‘c’) and (‘f) targetRow, targetCol: The position of the player away: A boolean that indicates if the ghost should move toward (false) or away from (true) the target. Return Value: The best direction (e.g., {1, 0} for moving down), or null if no valid move is found.\nMovement Logic The ghost uses the Manhattan Distance to evaluate its moves. This heuristic calculates the distance to the target as:\nFor each direction:\nThe ghost checks if moving in that direction is valid using isValidMove. It calculates the Manhattan Distance from the potential new position to the target. It selects the move with the smallest distance (to chase) or the largest distance (to run away). Supporting Methods isValidMove: Ensures the ghost doesn’t move into walls or outside the grid boundaries. isCollidingWithGhost: Prevents ghosts from colliding with each other. updateGrid: Updates the game grid to reflect the ghost’s new position. Example Walkthrough Let’s say the ghost is at (2, 3) and Pac-Man is at (5, 5):\nThe algorithm evaluates all possible moves:\nUp: (1, 3), distance = 6 Down: (3, 3), distance = 4 Left: (2, 2), distance = 6 Right: (2, 4), distance = 4 If away == false (not scared), the ghost chooses the move with the smallest distance (Down or Right).\nIf away == true (scared), the ghost chooses the move with the largest distance (Up or Left).\nPros and Cons of Greedy Best-First Search Pros: Simplicity: The algorithm is easy to implement and computationally lightweight. Speed: Evaluating only four directions makes it fast, especially on small grids. Cons: No Global Optimization: It doesn’t guarantee the shortest or most efficient path to the target. Heuristic Limitations: The Manhattan Distance works well for simple grids but may not handle complex obstacles effectively. Conclusion The Greedy Best-First Search algorithm is an excellent choice for games like Pac-Man, where simplicity and responsiveness are key. It balances efficiency with functionality, allowing ghosts to behave dynamically without requiring heavy computations. By tweaking elements like the scare duration or movement randomness, developers can fine-tune ghost behavior for an engaging player experience.\n",
+  "wordCount" : "673",
+  "inLanguage": "en",
+  "datePublished": "2025-01-21T00:00:00Z",
+  "dateModified": "2025-01-21T00:00:00Z",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://sameerahman.com/posts/pathfinding/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Sameer's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://sameerahman.com/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://sameerahman.com/" accesskey="h" title="Sameer&#39;s Blog (Alt + H)">Sameer&#39;s Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+
+            
+            
+            <li><a href="/archives/" title="Archives">Archives</a></li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      Developing a Path Finding Algorithm for my game
+    </h1>
+    <div class="post-meta"><span title='2025-01-21 00:00:00 +0000 UTC'>January 21, 2025</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="introduction">Introduction<a hidden class="anchor" aria-hidden="true" href="#introduction">#</a></h1>
+<p>I was creating a game inspired from Pacman to brush up my coding skills that I learnt on the first semester of college only to come across a road block. How will the ghosts track the player and move towards you? The solution I used is the <strong>Greedy Best-First Search</strong>. Now before we dive into it we must first familiarize ourselves with how the ghosts move in the game itself.</p>
+<h2 id="understanding-the-ghosts-movement">Understanding the Ghost’s Movement<a hidden class="anchor" aria-hidden="true" href="#understanding-the-ghosts-movement">#</a></h2>
+<p>The ghost moves on a grid, where its primary goal is to either chase Pac-Man or, when scared, run away from him. To decide where to move next, the ghost needs to evaluate all possible directions and choose the best one. This is where pathfinding comes in. Specifically, the ghost evaluates its potential moves using a heuristic called the Manhattan Distance.</p>
+<h2 id="the-concept-of-manhattan-distance">The Concept of Manhattan Distance<a hidden class="anchor" aria-hidden="true" href="#the-concept-of-manhattan-distance">#</a></h2>
+<p>Manhattan Distance is a simple but effective way to measure the distance between two points on a grid. The term comes from the layout of streets in the Manhattan borough of New York, where streets are aligned in a grid pattern. In this system, the distance between two points is calculated by summing the absolute differences of their respective x and y coordinates.</p>
+<p>For example, if the ghost is at position (2, 3) and Pac-Man is at (5, 5), the Manhattan Distance would be:</p>
+<p>Horizontal distance = |5 - 2| = 3
+Vertical distance = |5 - 3| = 2
+Total Manhattan Distance = 3 + 2 = 5</p>
+<h3 id="directions-array">Directions Array<a hidden class="anchor" aria-hidden="true" href="#directions-array">#</a></h3>
+<p>The ghost can move up, down, left, or right and these options are represented as:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">final</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">[][]</span> DIRECTIONS <span style="color:#f92672">=</span> {{<span style="color:#f92672">-</span>1, 0}, {1, 0}, {0, <span style="color:#f92672">-</span>1}, {0, 1}};
+</span></span></code></pre></div><ul>
+<li><code>{-1, 0}</code>: Move up</li>
+<li><code>{1, 0}</code>: Move down</li>
+<li><code>{0, -1}</code>: Move left</li>
+<li><code>{0, 1}</code>: Move right</li>
+</ul>
+<h3 id="the-pathfinding-method">The Pathfinding Method<a hidden class="anchor" aria-hidden="true" href="#the-pathfinding-method">#</a></h3>
+<p>The main method that determines the ghost&rsquo;s movement is:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">[]</span> <span style="color:#a6e22e">findBestPath</span>(<span style="color:#66d9ef">char</span><span style="color:#f92672">[][]</span> grid, <span style="color:#66d9ef">int</span> targetRow, <span style="color:#66d9ef">int</span> targetCol, <span style="color:#66d9ef">boolean</span> away)
+</span></span></code></pre></div><h4 id="parameters">Parameters:<a hidden class="anchor" aria-hidden="true" href="#parameters">#</a></h4>
+<ul>
+<li><strong>grid</strong>: The game grid, which includes walls (&lsquo;W&rsquo;), (&lsquo;c&rsquo;) and (&lsquo;f)</li>
+<li><strong>targetRow, targetCol</strong>: The position of the player</li>
+<li><strong>away</strong>: A boolean that indicates if the ghost should move toward (false) or away from (true) the target.</li>
+</ul>
+<h4 id="return-value">Return Value:<a hidden class="anchor" aria-hidden="true" href="#return-value">#</a></h4>
+<p>The best direction (e.g., <code>{1, 0}</code> for moving down), or null if no valid move is found.</p>
+<h3 id="movement-logic">Movement Logic<a hidden class="anchor" aria-hidden="true" href="#movement-logic">#</a></h3>
+<p>The ghost uses the Manhattan Distance to evaluate its moves. This heuristic calculates the distance to the target as:</p>
+<p>For each direction:</p>
+<ol>
+<li>The ghost checks if moving in that direction is valid using <code>isValidMove</code>.</li>
+<li>It calculates the Manhattan Distance from the potential new position to the target.</li>
+<li>It selects the move with the smallest distance (to chase) or the largest distance (to run away).</li>
+</ol>
+<h3 id="supporting-methods">Supporting Methods<a hidden class="anchor" aria-hidden="true" href="#supporting-methods">#</a></h3>
+<ul>
+<li><strong>isValidMove</strong>: Ensures the ghost doesn’t move into walls or outside the grid boundaries.</li>
+<li><strong>isCollidingWithGhost</strong>: Prevents ghosts from colliding with each other.</li>
+<li><strong>updateGrid</strong>: Updates the game grid to reflect the ghost’s new position.</li>
+</ul>
+<h3 id="example-walkthrough">Example Walkthrough<a hidden class="anchor" aria-hidden="true" href="#example-walkthrough">#</a></h3>
+<p>Let’s say the ghost is at (2, 3) and Pac-Man is at (5, 5):</p>
+<p>The algorithm evaluates all possible moves:</p>
+<ul>
+<li>Up: (1, 3), distance = 6</li>
+<li>Down: (3, 3), distance = 4</li>
+<li>Left: (2, 2), distance = 6</li>
+<li>Right: (2, 4), distance = 4</li>
+</ul>
+<p>If <code>away == false</code> (not scared), the ghost chooses the move with the smallest distance (Down or Right).</p>
+<p>If <code>away == true</code> (scared), the ghost chooses the move with the largest distance (Up or Left).</p>
+<h3 id="pros-and-cons-of-greedy-best-first-search">Pros and Cons of Greedy Best-First Search<a hidden class="anchor" aria-hidden="true" href="#pros-and-cons-of-greedy-best-first-search">#</a></h3>
+<h4 id="pros">Pros:<a hidden class="anchor" aria-hidden="true" href="#pros">#</a></h4>
+<ul>
+<li><strong>Simplicity</strong>: The algorithm is easy to implement and computationally lightweight.</li>
+<li><strong>Speed</strong>: Evaluating only four directions makes it fast, especially on small grids.</li>
+</ul>
+<h4 id="cons">Cons:<a hidden class="anchor" aria-hidden="true" href="#cons">#</a></h4>
+<ul>
+<li><strong>No Global Optimization</strong>: It doesn’t guarantee the shortest or most efficient path to the target.</li>
+<li><strong>Heuristic Limitations</strong>: The Manhattan Distance works well for simple grids but may not handle complex obstacles effectively.</li>
+</ul>
+<h3 id="conclusion">Conclusion<a hidden class="anchor" aria-hidden="true" href="#conclusion">#</a></h3>
+<p>The Greedy Best-First Search algorithm is an excellent choice for games like Pac-Man, where simplicity and responsiveness are key. It balances efficiency with functionality, allowing ghosts to behave dynamically without requiring heavy computations. By tweaking elements like the scare duration or movement randomness, developers can fine-tune ghost behavior for an engaging player experience.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://sameerahman.com/tags/projects/">Projects</a></li>
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="https://sameerahman.com/">Sameer&#39;s Blog</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>Sameer&#39;s Blog</title>
-    <link>https://sameerahman.com/</link>
-    <description>Recent content on Sameer&#39;s Blog</description>
+    <title>Projects on Sameer&#39;s Blog</title>
+    <link>https://sameerahman.com/tags/projects/</link>
+    <description>Recent content in Projects on Sameer&#39;s Blog</description>
     <generator>Hugo -- 0.140.1</generator>
     <language>en-us</language>
     <lastBuildDate>Thu, 13 Mar 2025 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://sameerahman.com/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://sameerahman.com/tags/projects/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Using ESP32 camera module to take pictures </title>
       <link>https://sameerahman.com/posts/m5microscope/</link>
@@ -23,22 +23,6 @@
       <guid>https://sameerahman.com/posts/pathfinding/</guid>
       <description>&lt;h1 id=&#34;introduction&#34;&gt;Introduction&lt;/h1&gt;
 &lt;p&gt;I was creating a game inspired from Pacman to brush up my coding skills that I learnt on the first semester of college only to come across a road block. How will the ghosts track the player and move towards you? The solution I used is the &lt;strong&gt;Greedy Best-First Search&lt;/strong&gt;. Now before we dive into it we must first familiarize ourselves with how the ghosts move in the game itself.&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>About Me</title>
-      <link>https://sameerahman.com/posts/aboutme/</link>
-      <pubDate>Sat, 28 Dec 2024 20:07:49 +0600</pubDate>
-      <guid>https://sameerahman.com/posts/aboutme/</guid>
-      <description>&lt;h2 id=&#34;the-start&#34;&gt;The Start&lt;/h2&gt;
-&lt;p&gt;Hello, my name is &lt;strong&gt;Sameer&lt;/strong&gt;, and this is the beginning of my new blog. I&amp;rsquo;m currently studying at &lt;strong&gt;Case Western Reserve University&lt;/strong&gt;. I’m enthusiastic about tech and love learning new skills and this blog will be a space where I share my journey, projects, and the latest skills I’ve picked up.&lt;/p&gt;
-&lt;p&gt;Feel free to follow along, and if you have any questions, don’t hesitate to reach out to me via email.&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>Tags</title>
-      <link>https://sameerahman.com/tags/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://sameerahman.com/tags/</guid>
-      <description>Browse posts by tags.</description>
     </item>
   </channel>
 </rss>

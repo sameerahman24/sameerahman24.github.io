@@ -2,22 +2,28 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://sameerahman24.github.io/posts/aboutme/</loc>
+    <loc>https://sameerahman.com/posts/</loc>
+    <lastmod>2025-03-13T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://sameerahman.com/tags/projects/</loc>
+    <lastmod>2025-03-13T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://sameerahman.com/</loc>
+    <lastmod>2025-03-13T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://sameerahman.com/posts/m5microscope/</loc>
+    <lastmod>2025-03-13T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://sameerahman.com/posts/pathfinding/</loc>
+    <lastmod>2025-01-21T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://sameerahman.com/posts/aboutme/</loc>
     <lastmod>2024-12-28T20:07:49+06:00</lastmod>
   </url><url>
-    <loc>https://sameerahman24.github.io/posts/</loc>
-    <lastmod>2024-12-28T20:07:49+06:00</lastmod>
+    <loc>https://sameerahman.com/archives/</loc>
   </url><url>
-    <loc>https://sameerahman24.github.io/</loc>
-    <lastmod>2024-12-28T20:07:49+06:00</lastmod>
+    <loc>https://sameerahman.com/categories/</loc>
   </url><url>
-    <loc>https://sameerahman24.github.io/tags/test/</loc>
-    <lastmod>2024-12-28T20:07:49+06:00</lastmod>
-  </url><url>
-    <loc>https://sameerahman24.github.io/archives/</loc>
-  </url><url>
-    <loc>https://sameerahman24.github.io/categories/</loc>
-  </url><url>
-    <loc>https://sameerahman24.github.io/tags/</loc>
+    <loc>https://sameerahman.com/tags/</loc>
   </url>
 </urlset>
